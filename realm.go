@@ -3,6 +3,8 @@ package gowamp
 import (
 	"fmt"
 	"time"
+
+	"github.com/streamrail/concurrent-map"
 )
 
 const (
@@ -24,7 +26,7 @@ type Realm struct {
 	Authenticators   map[string]Authenticator
 	// DefaultAuth      func(details map[string]interface{}) (map[string]interface{}, error)
 	AuthTimeout time.Duration
-	clients     map[ID]Session
+	clients     cmap.ConcurrentMap
 	localClient
 }
 
@@ -45,13 +47,26 @@ func (r *Realm) getPeer(details map[string]interface{}) (Peer, error) {
 
 // Close disconnects all clients after sending a goodbye message
 func (r Realm) Close() {
-	for _, client := range r.clients {
-		client.kill <- ErrSystemShutdown
+	iter := r.clients.Iter()
+	for {
+		select {
+		case client, ok := <-iter:
+			if !ok {
+				return
+			}
+
+			sess, isSession := client.Val.(Session)
+			if !isSession {
+				continue
+			}
+
+			sess.kill <- ErrSystemShutdown
+		}
 	}
 }
 
 func (r *Realm) init() {
-	r.clients = make(map[ID]Session)
+	r.clients = cmap.New()
 	p, _ := r.getPeer(nil)
 	r.localClient.Client = NewClient(p)
 	if r.Broker == nil {
@@ -83,10 +98,10 @@ func (l *localClient) onLeave(session ID) {
 }
 
 func (r *Realm) handleSession(sess Session) {
-	r.clients[sess.Id] = sess
+	r.clients.Set(string(sess.Id), sess)
 	r.onJoin(sess.Details)
 	defer func() {
-		delete(r.clients, sess.Id)
+		r.clients.Remove(string(sess.Id))
 		r.Dealer.RemovePeer(sess.Peer)
 		r.onLeave(sess.Id)
 	}()
