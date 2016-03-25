@@ -11,9 +11,9 @@ class MyComponent(ApplicationSession):
         @asyncio.coroutine
         def hello(name):
             print("Hello, {}!".format(name))
-        registration = yield From(self.register(hello, u'turnpike.examples.hello'))
+        registration = yield From(self.register(hello, u'gowamp.examples.hello'))
         print("registered procedure")
-        yield From(self.call(u'turnpike.examples.hello', "Turnpike"))
+        yield From(self.call(u'gowamp.examples.hello', "Turnpike"))
         print("called procedure")
         yield From(registration.unregister())
         print("unregistered procedure")
@@ -28,5 +28,5 @@ class MyComponent(ApplicationSession):
 
 
 if __name__ == '__main__':
-    runner = ApplicationRunner(url=u"ws://localhost:8000", realm=u"turnpike.examples", debug_wamp=True)
+    runner = ApplicationRunner(url=u"ws://localhost:8000", realm=u"gowamp.examples", debug_wamp=True)
     runner.run(MyComponent)

@@ -9,7 +9,7 @@ import (
 	"net/http"
 
 	"github.com/satori/go.uuid"
-	"gopkg.in/jcelliott/turnpike.v2"
+	"github.com/gngeorgiev/gowamp"
 )
 
 // this is just an example, please don't actually use it
@@ -22,7 +22,7 @@ func (e *exampleAuth) Challenge(details map[string]interface{}) (map[string]inte
 }
 
 func (e *exampleAuth) Authenticate(c map[string]interface{}, signature string) (map[string]interface{}, error) {
-	// we assume this will work because turnpike gives us the same data the Challenge method returned
+	// we assume this will work because gowamp gives us the same data the Challenge method returned
 	challenge := c["challenge"].(string)
 	mac := hmac.New(sha256.New, []byte(e.password))
 	mac.Write([]byte(challenge))
@@ -37,10 +37,10 @@ func (e *exampleAuth) Authenticate(c map[string]interface{}, signature string) (
 }
 
 func main() {
-	turnpike.Debug()
-	s, err := turnpike.NewWebsocketServer(map[string]turnpike.Realm{
-		"turnpike.examples": {
-			CRAuthenticators: map[string]turnpike.CRAuthenticator{
+	gowamp.Debug()
+	s, err := gowamp.NewWebsocketServer(map[string]gowamp.Realm{
+		"gowamp.examples": {
+			CRAuthenticators: map[string]gowamp.CRAuthenticator{
 				"example-auth": &exampleAuth{password: "password"},
 			},
 		},
@@ -52,6 +52,6 @@ func main() {
 		log.Println("Connection from", r.RemoteAddr)
 		s.ServeHTTP(w, r)
 	})
-	log.Println("turnpike server starting on port 8000")
+	log.Println("gowamp server starting on port 8000")
 	log.Fatal(http.ListenAndServe(":8000", nil))
 }

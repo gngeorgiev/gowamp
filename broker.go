@@ -1,4 +1,6 @@
-package turnpike
+package gowamp
+
+import "log"
 
 // Broker is the interface implemented by an object that handles routing EVENTS
 // from Publishers to Subscribers.

@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 
-	"gopkg.in/jcelliott/turnpike.v2"
+	"github.com/gngeorgiev/gowamp"
 )
 
 const (
@@ -35,12 +35,12 @@ func main() {
 
 	username := os.Args[1]
 
-	// turnpike.Debug()
-	c, err := turnpike.NewWebsocketClient(turnpike.JSON, "ws://localhost:8000/")
+	// gowamp.Debug()
+	c, err := gowamp.NewWebsocketClient(gowamp.JSON, "ws://localhost:8000/")
 	if err != nil {
 		log.Fatal(err)
 	}
-	_, err = c.JoinRealm("turnpike.examples", nil)
+	_, err = c.JoinRealm("gowamp.examples", nil)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -67,7 +67,7 @@ func main() {
 	cw.dialog(messages)
 }
 
-func sendMessages(c *turnpike.Client, messages chan message) {
+func sendMessages(c *gowamp.Client, messages chan message) {
 	for msg := range messages {
 		if err := c.Publish("chat", []interface{}{msg.From, msg.Message}, nil); err != nil {
 			log.Println("Error sending message:", err)

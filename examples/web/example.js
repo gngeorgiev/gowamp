@@ -6,7 +6,7 @@
 		renderer,
 		stage,
 		colo,
-		channel = 'my.turnpike.chat';
+		channel = 'my.gowamp.chat';
 
 	function drawCircle(x, y, color) {
 		var g = new PIXI.Graphics(),
@@ -69,7 +69,7 @@
 	function initAutobahn() {
 		conn = new autobahn.Connection({
 			url: location.href.replace(/^http/, 'ws') + 'ws',
-			realm: 'turnpike.chat.realm',
+			realm: 'gowamp.chat.realm',
 		});
 
 		conn.onopen = function (sess) {

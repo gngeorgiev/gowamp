@@ -1,4 +1,4 @@
-package turnpike
+package gowamp
 
 import (
 	"fmt"
@@ -65,7 +65,7 @@ func (ep *websocketPeer) Close() error {
 	closeMsg := websocket.FormatCloseMessage(websocket.CloseNormalClosure, "goodbye")
 	err := ep.conn.WriteControl(websocket.CloseMessage, closeMsg, time.Now().Add(5*time.Second))
 	if err != nil {
-		log.Println("error sending close message:", err)
+		logger.Println("error sending close message:", err)
 	}
 	ep.closed = true
 	return ep.conn.Close()
@@ -77,9 +77,9 @@ func (ep *websocketPeer) run() {
 		// TODO: do something different based on binary/text frames
 		if msgType, b, err := ep.conn.ReadMessage(); err != nil {
 			if ep.closed {
-				log.Println("peer connection closed")
+				logger.Println("peer connection closed")
 			} else {
-				log.Println("error reading from peer:", err)
+				logger.Println("error reading from peer:", err)
 				ep.conn.Close()
 			}
 			close(ep.messages)
@@ -91,7 +91,7 @@ func (ep *websocketPeer) run() {
 		} else {
 			msg, err := ep.serializer.Deserialize(b)
 			if err != nil {
-				log.Println("error deserializing peer message:", err)
+				logger.Println("error deserializing peer message:", err)
 				// TODO: handle error
 			} else {
 				ep.messages <- msg

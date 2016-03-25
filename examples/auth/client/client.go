@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/howeyc/gopass"
-	"gopkg.in/jcelliott/turnpike.v2"
+	"github.com/gngeorgiev/gowamp"
 )
 
 var password []byte
@@ -26,17 +26,17 @@ func exampleAuthFunc(hello map[string]interface{}, c map[string]interface{}) (st
 }
 
 func main() {
-	turnpike.Debug()
+	gowamp.Debug()
 	fmt.Println("Hint: the password is 'password'")
 	fmt.Print("Password: ")
 	password = gopass.GetPasswd()
 
-	c, err := turnpike.NewWebsocketClient(turnpike.JSON, "ws://localhost:8000/ws")
+	c, err := gowamp.NewWebsocketClient(gowamp.JSON, "ws://localhost:8000/ws")
 	if err != nil {
 		log.Fatal(err)
 	}
-	c.Auth = map[string]turnpike.AuthFunc{"example-auth": exampleAuthFunc}
-	_, err = c.JoinRealm("turnpike.examples", nil)
+	c.Auth = map[string]gowamp.AuthFunc{"example-auth": exampleAuthFunc}
+	_, err = c.JoinRealm("gowamp.examples", nil)
 	if err != nil {
 		log.Fatal(err)
 	}

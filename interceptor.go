@@ -1,4 +1,4 @@
-package turnpike
+package gowamp
 
 // Interceptor is the interface implemented by an object that intercepts
 // messages in the router to modify them somehow.

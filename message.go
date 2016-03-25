@@ -1,4 +1,4 @@
-package turnpike
+package gowamp
 
 // Message is a generic container for a WAMP message.
 type Message interface {

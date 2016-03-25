@@ -3,16 +3,16 @@ package main
 import (
 	"log"
 
-	"gopkg.in/jcelliott/turnpike.v2"
+	"github.com/gngeorgiev/gowamp"
 )
 
 func main() {
-	c, err := turnpike.NewWebsocketClient(turnpike.JSON, "ws://localhost:8000/")
+	c, err := gowamp.NewWebsocketClient(gowamp.JSON, "ws://localhost:8000/")
 	if err != nil {
 		log.Fatal(err)
 	}
 	log.Println("connected to router")
-	_, err = c.JoinRealm("turnpike.examples", nil)
+	_, err = c.JoinRealm("gowamp.examples", nil)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -228,7 +228,7 @@ func (cw *chatWin) dialog(messages chan message) {
 			if line != "" {
 				log.Println("Entered message:", line)
 				msg := message{From: cw.username, Message: line}
-				// TODO: uncomment once turnpike is fixed to not send events to the sender
+				// TODO: uncomment once gowamp is fixed to not send events to the sender
 				// y, _ := chats.CursorYX()
 				// chats.MovePrint(y+1, 1, fmt.Sprintf("%s: %s", msg.From, msg.Message))
 				// chats.Refresh()

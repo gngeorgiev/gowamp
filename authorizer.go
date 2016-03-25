@@ -1,4 +1,4 @@
-package turnpike
+package gowamp
 
 // Authorizer is the interface implemented by an object that can determine
 // whether a particular request is authorized or not.

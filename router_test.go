@@ -1,4 +1,4 @@
-package turnpike
+package gowamp
 
 import "testing"
 import "time"
@@ -187,7 +187,7 @@ func TestRouterSubscribe(t *testing.T) {
 type basicCallee struct{}
 
 func TestRouterCall(t *testing.T) {
-	const testProcedure = URI("turnpike.test.endpoint")
+	const testProcedure = URI("gowamp.test.endpoint")
 	calleeClient, calleeServer := localPipe()
 	callee := &basicPeer{calleeClient}
 	r := basicConnect(t, callee, &basicPeer{calleeServer})

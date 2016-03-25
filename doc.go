@@ -1,4 +1,4 @@
-// Package turnpike implements WAMPv2 - The Web Application Messaging Protocol.
+// Package gowamp implements WAMPv2 - The Web Application Messaging Protocol.
 //
 // It provides router and client library implementations as well as a basic
 // stand-alone router. The router library can be used to embed a WAMP router in
@@ -7,4 +7,4 @@
 //
 // See the official WAMP documentation at http://wamp.ws for more details on the
 // protocol.
-package turnpike
+package gowamp

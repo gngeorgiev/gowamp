@@ -4,16 +4,16 @@ import (
 	"log"
 	"net/http"
 
-	"gopkg.in/jcelliott/turnpike.v2"
+	"github.com/gngeorgiev/gowamp"
 )
 
 func main() {
-	turnpike.Debug()
-	s := turnpike.NewBasicWebsocketServer("turnpike.examples")
+	gowamp.Debug()
+	s := gowamp.NewBasicWebsocketServer("gowamp.examples")
 	server := &http.Server{
 		Handler: s,
 		Addr:    ":8000",
 	}
-	log.Println("turnpike server starting on port 8000")
+	log.Println("gowamp server starting on port 8000")
 	log.Fatal(server.ListenAndServe())
 }

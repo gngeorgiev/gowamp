@@ -8,7 +8,7 @@ import (
 	"os/signal"
 	"time"
 
-	"gopkg.in/jcelliott/turnpike.v2"
+	"github.com/gngeorgiev/gowamp"
 )
 
 var (
@@ -26,9 +26,9 @@ func init() {
 func main() {
 	flag.Parse()
 	if debug {
-		turnpike.Debug()
+		gowamp.Debug()
 	}
-	s := turnpike.NewBasicWebsocketServer(realm)
+	s := gowamp.NewBasicWebsocketServer(realm)
 	shutdown := make(chan os.Signal, 1)
 	signal.Notify(shutdown, os.Interrupt)
 	go func() {
@@ -43,6 +43,6 @@ func main() {
 		Handler: s,
 		Addr:    ":8000",
 	}
-	log.Printf("turnpike server starting on port %d...", port)
+	log.Printf("gowamp server starting on port %d...", port)
 	log.Fatal(server.ListenAndServe())
 }

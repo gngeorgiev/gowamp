@@ -1,4 +1,4 @@
-package turnpike
+package gowamp
 
 // A Dealer routes and manages RPC calls to callees.
 type Dealer interface {
@@ -36,7 +36,7 @@ type defaultDealer struct {
 	callees map[Sender]map[ID]bool
 }
 
-// NewDefaultDealer returns the default turnpike dealer implementation
+// NewDefaultDealer returns the default gowamp dealer implementation
 func NewDefaultDealer() Dealer {
 	return &defaultDealer{
 		procedures:    make(map[ID]remoteProcedure),
@@ -49,7 +49,7 @@ func NewDefaultDealer() Dealer {
 
 func (d *defaultDealer) Register(callee Sender, msg *Register) {
 	if id, ok := d.registrations[msg.Procedure]; ok {
-		log.Println("error: procedure already exists:", msg.Procedure, id)
+		logger.Println("error: procedure already exists:", msg.Procedure, id)
 		callee.Send(&Error{
 			Type:    msg.MessageType(),
 			Request: msg.Request,
@@ -62,7 +62,7 @@ func (d *defaultDealer) Register(callee Sender, msg *Register) {
 	d.procedures[reg] = remoteProcedure{callee, msg.Procedure}
 	d.registrations[msg.Procedure] = reg
 	d.addCalleeRegistration(callee, reg)
-	log.Printf("registered procedure %v [%v]", reg, msg.Procedure)
+	logger.Printf("registered procedure %v [%v]", reg, msg.Procedure)
 	callee.Send(&Registered{
 		Request:      msg.Request,
 		Registration: reg,
@@ -72,7 +72,7 @@ func (d *defaultDealer) Register(callee Sender, msg *Register) {
 func (d *defaultDealer) Unregister(callee Sender, msg *Unregister) {
 	if procedure, ok := d.procedures[msg.Registration]; !ok {
 		// the registration doesn't exist
-		log.Println("error: no such registration:", msg.Registration)
+		logger.Println("error: no such registration:", msg.Registration)
 		callee.Send(&Error{
 			Type:    msg.MessageType(),
 			Request: msg.Request,
@@ -83,7 +83,7 @@ func (d *defaultDealer) Unregister(callee Sender, msg *Unregister) {
 		delete(d.registrations, procedure.Procedure)
 		delete(d.procedures, msg.Registration)
 		d.removeCalleeRegistration(callee, msg.Registration)
-		log.Printf("unregistered procedure %v [%v]", procedure.Procedure, msg.Registration)
+		logger.Printf("unregistered procedure %v [%v]", procedure.Procedure, msg.Registration)
 		callee.Send(&Unregistered{
 			Request: msg.Request,
 		})
@@ -121,7 +121,7 @@ func (d *defaultDealer) Call(caller Sender, msg *Call) {
 				Arguments:    msg.Arguments,
 				ArgumentsKw:  msg.ArgumentsKw,
 			})
-			log.Printf("dispatched CALL %v [%v] to callee as INVOCATION %v",
+			logger.Printf("dispatched CALL %v [%v] to callee as INVOCATION %v",
 				msg.Request, msg.Procedure, invocationID,
 			)
 		}
@@ -131,13 +131,13 @@ func (d *defaultDealer) Call(caller Sender, msg *Call) {
 func (d *defaultDealer) Yield(callee Sender, msg *Yield) {
 	if callID, ok := d.invocations[msg.Request]; !ok {
 		// WAMP spec doesn't allow sending an error in response to a YIELD message
-		log.Println("received YIELD message with invalid invocation request ID:", msg.Request)
+		logger.Println("received YIELD message with invalid invocation request ID:", msg.Request)
 	} else {
 		delete(d.invocations, msg.Request)
 		if caller, ok := d.calls[callID]; !ok {
 			// found the invocation id, but doesn't match any call id
 			// WAMP spec doesn't allow sending an error in response to a YIELD message
-			log.Printf("received YIELD message, but unable to match it (%v) to a CALL ID", msg.Request)
+			logger.Printf("received YIELD message, but unable to match it (%v) to a CALL ID", msg.Request)
 		} else {
 			delete(d.calls, callID)
 			// return the result to the caller
@@ -147,18 +147,18 @@ func (d *defaultDealer) Yield(callee Sender, msg *Yield) {
 				Arguments:   msg.Arguments,
 				ArgumentsKw: msg.ArgumentsKw,
 			})
-			log.Printf("returned YIELD %v to caller as RESULT %v", msg.Request, callID)
+			logger.Printf("returned YIELD %v to caller as RESULT %v", msg.Request, callID)
 		}
 	}
 }
 
 func (d *defaultDealer) Error(peer Sender, msg *Error) {
 	if callID, ok := d.invocations[msg.Request]; !ok {
-		log.Println("received ERROR (INVOCATION) message with invalid invocation request ID:", msg.Request)
+		logger.Println("received ERROR (INVOCATION) message with invalid invocation request ID:", msg.Request)
 	} else {
 		delete(d.invocations, msg.Request)
 		if caller, ok := d.calls[callID]; !ok {
-			log.Printf("received ERROR (INVOCATION) message, but unable to match it (%v) to a CALL ID", msg.Request)
+			logger.Printf("received ERROR (INVOCATION) message, but unable to match it (%v) to a CALL ID", msg.Request)
 		} else {
 			delete(d.calls, callID)
 			// return an error to the caller
@@ -169,7 +169,7 @@ func (d *defaultDealer) Error(peer Sender, msg *Error) {
 				Arguments:   msg.Arguments,
 				ArgumentsKw: msg.ArgumentsKw,
 			})
-			log.Printf("returned ERROR %v to caller as ERROR %v", msg.Request, callID)
+			logger.Printf("returned ERROR %v to caller as ERROR %v", msg.Request, callID)
 		}
 	}
 }

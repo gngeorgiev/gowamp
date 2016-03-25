@@ -1,4 +1,4 @@
-Turnpike [![Build Status](https://drone.io/github.com/jcelliott/turnpike/status.png)](https://drone.io/github.com/jcelliott/turnpike/latest) [![Coverage Status](https://coveralls.io/repos/jcelliott/turnpike/badge.svg?branch=v2)](https://coveralls.io/r/jcelliott/turnpike?branch=v2) [![GoDoc](https://godoc.org/gopkg.in/jcelliott/turnpike?status.svg)](http://godoc.org/gopkg.in/jcelliott/turnpike.v2)
+Turnpike [![Build Status](https://drone.io/github.com/jcelliott/gowamp/status.png)](https://drone.io/github.com/jcelliott/gowamp/latest) [![Coverage Status](https://coveralls.io/repos/jcelliott/gowamp/badge.svg?branch=v2)](https://coveralls.io/r/jcelliott/gowamp?branch=v2) [![GoDoc](https://godoc.org/gopkg.in/jcelliott/gowamp?status.svg)](http://godoc.org/github.com/gngeorgiev/gowamp)
 ===
 
 Go implementation of [WAMP](http://wamp.ws/) - The Web Application Messaging Protocol
@@ -18,25 +18,25 @@ basic stand-alone router. The router library can be used to embed a WAMP router
 in another application, or to build a custom router implementation. The client
 library can be used to communicate with any WAMP router.
 
-This version of Turnpike supports WAMP v2. For WAMP v1 support see the [v1 branch](https://github.com/jcelliott/turnpike/tree/v1).
+This version of Turnpike supports WAMP v2. For WAMP v1 support see the [v1 branch](https://github.com/jcelliott/gowamp/tree/v1).
 
 Status
 ---
 
 Turnpike v2 is still under development, but is getting close to a stable
 release. If you have any feedback or suggestions, please
-[open an issue](https://github.com/jcelliott/turnpike/issues/new).
+[open an issue](https://github.com/jcelliott/gowamp/issues/new).
 
 Installation
 ---
 
 Library:
 
-    go get -u gopkg.in/jcelliott/turnpike.v2
+    go get -u github.com/gngeorgiev/gowamp
 
 Stand-alone router:
 
-    go get -u gopkg.in/jcelliott/turnpike.v2/turnpike
+    go get -u github.com/gngeorgiev/gowamp/gowamp
 
 Client library usage
 ---
@@ -56,17 +56,17 @@ import (
 	"log"
 	"net/http"
 
-	"gopkg.in/jcelliott/turnpike.v2"
+	"github.com/gngeorgiev/gowamp"
 )
 
 func main() {
-	turnpike.Debug()
-	s := turnpike.NewBasicWebsocketServer("example.realm")
+	gowamp.Debug()
+	s := gowamp.NewBasicWebsocketServer("example.realm")
 	server := &http.Server{
 		Handler: s,
 		Addr:    ":8000",
 	}
-	log.Println("turnpike server starting on port 8000")
+	log.Println("gowamp server starting on port 8000")
 	log.Fatal(server.ListenAndServe())
 }
 ```
@@ -88,12 +88,12 @@ Stand-alone router usage
 
 Run the router with default settings:
 
-    $GOPATH/bin/turnpike
+    $GOPATH/bin/gowamp
 
 Router options:
 
 ```
-Usage of turnpike:
+Usage of gowamp:
   -port int
         port to run on (default 8000)
   -realm string

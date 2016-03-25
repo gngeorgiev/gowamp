@@ -1,4 +1,4 @@
-package turnpike
+package gowamp
 
 import (
 	"testing"
@@ -9,7 +9,7 @@ import (
 
 func newTestRouter() *defaultRouter {
 	router := NewDefaultRouter()
-	router.RegisterRealm(URI("turnpike.test"), Realm{})
+	router.RegisterRealm(URI("gowamp.test"), Realm{})
 	return router.(*defaultRouter)
 }
 
@@ -23,7 +23,7 @@ func connectedTestClients() (*Client, *Client) {
 func newTestClient(p Peer) *Client {
 	client := NewClient(p)
 	client.ReceiveTimeout = 100 * time.Millisecond
-	_, err := client.JoinRealm("turnpike.test", nil)
+	_, err := client.JoinRealm("gowamp.test", nil)
 	So(err, ShouldBeNil)
 	return client
 }
@@ -34,7 +34,7 @@ func TestJoinRealm(t *testing.T) {
 
 		Convey("A client should be able to succesfully join a realm", func() {
 			client := NewClient(peer)
-			_, err := client.JoinRealm("turnpike.test", nil)
+			_, err := client.JoinRealm("gowamp.test", nil)
 			So(err, ShouldBeNil)
 		})
 	})
@@ -47,7 +47,7 @@ func testAuthFunc(d map[string]interface{}, c map[string]interface{}) (string, m
 func TestJoinRealmWithAuth(t *testing.T) {
 	Convey("Given a server accepting client connections", t, func() {
 		router := newTestRouter()
-		router.RegisterRealm(URI("turnpike.test.auth"), Realm{
+		router.RegisterRealm(URI("gowamp.test.auth"), Realm{
 			CRAuthenticators: map[string]CRAuthenticator{"testauth": &testCRAuthenticator{}},
 		})
 
@@ -57,7 +57,7 @@ func TestJoinRealmWithAuth(t *testing.T) {
 			client := NewClient(peer)
 			client.Auth = map[string]AuthFunc{"testauth": testAuthFunc}
 			details := map[string]interface{}{"username": "tester"}
-			_, err := client.JoinRealm("turnpike.test.auth", details)
+			_, err := client.JoinRealm("gowamp.test.auth", details)
 			So(err, ShouldBeNil)
 		})
 	})

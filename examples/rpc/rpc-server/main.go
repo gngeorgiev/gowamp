@@ -5,35 +5,35 @@ import (
 	"net/http"
 	"time"
 
-	"gopkg.in/jcelliott/turnpike.v2"
+	"github.com/gngeorgiev/gowamp"
 )
 
-var client *turnpike.Client
+var client *gowamp.Client
 
 func main() {
-	turnpike.Debug()
-	s := turnpike.NewBasicWebsocketServer("turnpike.examples")
+	gowamp.Debug()
+	s := gowamp.NewBasicWebsocketServer("gowamp.examples")
 	server := &http.Server{
 		Handler: s,
 		Addr:    ":8000",
 	}
-	client, _ = s.GetLocalClient("turnpike.examples", nil)
+	client, _ = s.GetLocalClient("gowamp.examples", nil)
 	if err := client.BasicRegister("alarm.set", alarmSet); err != nil {
 		panic(err)
 	}
-	log.Println("turnpike server starting on port 8000")
+	log.Println("gowamp server starting on port 8000")
 	log.Fatal(server.ListenAndServe())
 }
 
 // takes one argument, the (integer) number of seconds to set the alarm for
-func alarmSet(args []interface{}, kwargs map[string]interface{}) (result *turnpike.CallResult) {
+func alarmSet(args []interface{}, kwargs map[string]interface{}) (result *gowamp.CallResult) {
 	duration, ok := args[0].(float64)
 	if !ok {
-		return &turnpike.CallResult{Err: turnpike.URI("rpc-example.invalid-argument")}
+		return &gowamp.CallResult{Err: gowamp.URI("rpc-example.invalid-argument")}
 	}
 	go func() {
 		time.Sleep(time.Duration(duration) * time.Second)
 		client.Publish("alarm.ring", nil, nil)
 	}()
-	return &turnpike.CallResult{Args: []interface{}{"hello"}}
+	return &gowamp.CallResult{Args: []interface{}{"hello"}}
 }

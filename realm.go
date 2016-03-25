@@ -1,4 +1,4 @@
-package turnpike
+package gowamp
 
 import (
 	"fmt"
@@ -39,7 +39,7 @@ func (r *Realm) getPeer(details map[string]interface{}) (Peer, error) {
 		details = make(map[string]interface{})
 	}
 	go r.handleSession(sess)
-	log.Println("Established internal session:", sess)
+	logger.Println("Established internal session:", sess)
 	return peerB, nil
 }
 
@@ -99,25 +99,25 @@ func (r *Realm) handleSession(sess Session) {
 		select {
 		case msg, open = <-c:
 			if !open {
-				log.Println("lost session:", sess)
+				logger.Println("lost session:", sess)
 				return
 			}
 		case reason := <-sess.kill:
 			logErr(sess.Send(&Goodbye{Reason: reason, Details: make(map[string]interface{})}))
-			log.Printf("kill session %s: %v", sess, reason)
+			logger.Printf("kill session %s: %v", sess, reason)
 			// TODO: wait for client Goodbye?
 			return
 		}
 
-		log.Printf("[%s] %s: %+v", sess, msg.MessageType(), msg)
+		logger.Printf("[%s] %s: %+v", sess, msg.MessageType(), msg)
 		if isAuthz, err := r.Authorizer.Authorize(sess, msg); !isAuthz {
 			errMsg := &Error{Type: msg.MessageType()}
 			if err != nil {
 				errMsg.Error = ErrAuthorizationFailed
-				log.Printf("[%s] authorization failed: %v", sess, err)
+				logger.Printf("[%s] authorization failed: %v", sess, err)
 			} else {
 				errMsg.Error = ErrNotAuthorized
-				log.Printf("[%s] %s UNAUTHORIZED", sess, msg.MessageType())
+				logger.Printf("[%s] %s UNAUTHORIZED", sess, msg.MessageType())
 			}
 			logErr(sess.Send(errMsg))
 			continue
@@ -128,7 +128,7 @@ func (r *Realm) handleSession(sess Session) {
 		switch msg := msg.(type) {
 		case *Goodbye:
 			logErr(sess.Send(&Goodbye{Reason: ErrGoodbyeAndOut, Details: make(map[string]interface{})}))
-			log.Printf("[%s] leaving: %v", sess, msg.Reason)
+			logger.Printf("[%s] leaving: %v", sess, msg.Reason)
 			return
 
 		// Broker messages
@@ -155,11 +155,11 @@ func (r *Realm) handleSession(sess Session) {
 				// the only type of ERROR message the router should receive
 				r.Dealer.Error(sess.Peer, msg)
 			} else {
-				log.Printf("invalid ERROR message received: %v", msg)
+				logger.Printf("invalid ERROR message received: %v", msg)
 			}
 
 		default:
-			log.Println("Unhandled message:", msg.MessageType())
+			logger.Println("Unhandled message:", msg.MessageType())
 		}
 	}
 }
@@ -183,7 +183,7 @@ func (r *Realm) handleAuth(client Peer, details map[string]interface{}) (*Welcom
 	if err != nil {
 		return nil, err
 	}
-	log.Printf("%s: %+v", msg.MessageType(), msg)
+	logger.Printf("%s: %+v", msg.MessageType(), msg)
 	if authenticate, ok := msg.(*Authenticate); !ok {
 		return nil, fmt.Errorf("unexpected %s message received", msg.MessageType())
 	} else {
@@ -194,7 +194,7 @@ func (r *Realm) handleAuth(client Peer, details map[string]interface{}) (*Welcom
 // Authenticate either authenticates a client or returns a challenge message if
 // challenge/response authentication is to be used.
 func (r Realm) authenticate(details map[string]interface{}) (Message, error) {
-	log.Println("details:", details)
+	logger.Println("details:", details)
 	if len(r.Authenticators) == 0 && len(r.CRAuthenticators) == 0 {
 		return &Welcome{}, nil
 	}
@@ -210,7 +210,7 @@ func (r Realm) authenticate(details map[string]interface{}) (Message, error) {
 		if m, ok := method.(string); ok {
 			authmethods = append(authmethods, m)
 		} else {
-			log.Printf("invalid authmethod value: %v", method)
+			logger.Printf("invalid authmethod value: %v", method)
 		}
 	}
 	for _, method := range authmethods {
@@ -255,12 +255,12 @@ func addAuthMethod(details map[string]interface{}, method string) map[string]int
 }
 
 // r := Realm{
-// 	Authenticators: map[string]turnpike.Authenticator{
-// 		"wampcra": turnpike.NewCRAAuthenticatorFactoryFactory(mySecret),
-// 		"ticket": turnpike.NewTicketAuthenticator(myTicket),
+// 	Authenticators: map[string]gowamp.Authenticator{
+// 		"wampcra": gowamp.NewCRAAuthenticatorFactoryFactory(mySecret),
+// 		"ticket": gowamp.NewTicketAuthenticator(myTicket),
 // 		"asdfasdf": myAsdfAuthenticator,
 // 	},
-// 	BasicAuthenticators: map[string]turnpike.BasicAuthenticator{
+// 	BasicAuthenticators: map[string]gowamp.BasicAuthenticator{
 // 		"anonymous": nil,
 // 	},
 // }

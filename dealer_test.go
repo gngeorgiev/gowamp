@@ -1,4 +1,4 @@
-package turnpike
+package gowamp
 
 import (
 	"testing"
@@ -10,7 +10,7 @@ func TestRegister(t *testing.T) {
 	Convey("Registering a procedure", t, func() {
 		dealer := NewDefaultDealer().(*defaultDealer)
 		callee := &TestSender{}
-		testProcedure := URI("turnpike.test.endpoint")
+		testProcedure := URI("gowamp.test.endpoint")
 		msg := &Register{Request: 123, Procedure: testProcedure}
 		dealer.Register(callee, msg)
 
@@ -42,7 +42,7 @@ func TestRegister(t *testing.T) {
 func TestUnregister(t *testing.T) {
 	dealer := NewDefaultDealer().(*defaultDealer)
 	callee := &TestSender{}
-	testProcedure := URI("turnpike.test.endpoint")
+	testProcedure := URI("gowamp.test.endpoint")
 	msg := &Register{Request: 123, Procedure: testProcedure}
 	dealer.Register(callee, msg)
 	reg := callee.received.(*Registered).Registration
@@ -69,13 +69,13 @@ func TestCall(t *testing.T) {
 	Convey("With a procedure registered", t, func() {
 		dealer := NewDefaultDealer().(*defaultDealer)
 		callee := &TestSender{}
-		testProcedure := URI("turnpike.test.endpoint")
+		testProcedure := URI("gowamp.test.endpoint")
 		msg := &Register{Request: 123, Procedure: testProcedure}
 		dealer.Register(callee, msg)
 		caller := &TestSender{}
 
 		Convey("Calling an invalid procedure", func() {
-			msg := &Call{Request: 124, Procedure: URI("turnpike.test.bad")}
+			msg := &Call{Request: 124, Procedure: URI("gowamp.test.bad")}
 			dealer.Call(caller, msg)
 
 			Convey("The caller should have received an ERROR message", func() {
@@ -121,7 +121,7 @@ func TestRemovePeer(t *testing.T) {
 	Convey("With a procedure registered", t, func() {
 		dealer := NewDefaultDealer().(*defaultDealer)
 		callee := &TestSender{}
-		testProcedure := URI("turnpike.test.endpoint")
+		testProcedure := URI("gowamp.test.endpoint")
 		msg := &Register{Request: 123, Procedure: testProcedure}
 		dealer.Register(callee, msg)
 		reg := callee.received.(*Registered).Registration

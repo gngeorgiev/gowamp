@@ -1,4 +1,4 @@
-package turnpike
+package gowamp
 
 import (
 	"fmt"
@@ -88,7 +88,7 @@ func (r *defaultRouter) RegisterRealm(uri URI, realm Realm) error {
 	}
 	realm.init()
 	r.realms[uri] = realm
-	log.Println("registered realm:", uri)
+	logger.Println("registered realm:", uri)
 	return nil
 }
 
@@ -103,7 +103,7 @@ func (r *defaultRouter) Accept(client Peer) error {
 	if err != nil {
 		return err
 	}
-	log.Printf("%s: %+v", msg.MessageType(), msg)
+	logger.Printf("%s: %+v", msg.MessageType(), msg)
 
 	hello, ok := msg.(*Hello)
 	if !ok {
@@ -144,7 +144,7 @@ func (r *defaultRouter) Accept(client Peer) error {
 	if err := client.Send(welcome); err != nil {
 		return err
 	}
-	log.Println("Established session:", welcome.Id)
+	logger.Println("Established session:", welcome.Id)
 
 	// session details
 	welcome.Details["session"] = welcome.Id

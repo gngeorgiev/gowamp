@@ -1,4 +1,4 @@
-package turnpike
+package gowamp
 
 import (
 	_ "github.com/smartystreets/goconvey/convey"

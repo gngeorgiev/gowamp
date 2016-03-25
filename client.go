@@ -1,4 +1,4 @@
-package turnpike
+package gowamp
 
 import (
 	"fmt"
@@ -8,15 +8,15 @@ import (
 var (
 	abortUnexpectedMsg = &Abort{
 		Details: map[string]interface{}{},
-		Reason:  "turnpike.error.unexpected_message_type",
+		Reason:  "gowamp.error.unexpected_message_type",
 	}
 	abortNoAuthHandler = &Abort{
 		Details: map[string]interface{}{},
-		Reason:  "turnpike.error.no_handler_for_authmethod",
+		Reason:  "gowamp.error.no_handler_for_authmethod",
 	}
 	abortAuthFailure = &Abort{
 		Details: map[string]interface{}{},
-		Reason:  "turnpike.error.authentication_failure",
+		Reason:  "gowamp.error.authentication_failure",
 	}
 	goodbyeClient = &Goodbye{
 		Details: map[string]interface{}{},
@@ -214,7 +214,7 @@ func (c *Client) Receive() {
 			if event, ok := c.events[msg.Subscription]; ok {
 				go event.handler(msg.Arguments, msg.ArgumentsKw)
 			} else {
-				log.Println("no handler registered for subscription:", msg.Subscription)
+				logger.Println("no handler registered for subscription:", msg.Subscription)
 			}
 
 		case *Invocation:
@@ -234,14 +234,14 @@ func (c *Client) Receive() {
 			c.notifyListener(msg, msg.Request)
 
 		case *Goodbye:
-			log.Println("client received Goodbye message")
+			logger.Println("client received Goodbye message")
 			break
 
 		default:
-			log.Println("unhandled message:", msg.MessageType(), msg)
+			logger.Println("unhandled message:", msg.MessageType(), msg)
 		}
 	}
-	log.Println("client closed")
+	logger.Println("client closed")
 
 	if c.ReceiveDone != nil {
 		c.ReceiveDone <- true
@@ -253,7 +253,7 @@ func (c *Client) notifyListener(msg Message, requestID ID) {
 	if l, ok := c.listeners[requestID]; ok {
 		l <- msg
 	} else {
-		log.Println("no listener for message", msg.MessageType(), requestID)
+		logger.Println("no listener for message", msg.MessageType(), requestID)
 	}
 }
 
@@ -282,30 +282,30 @@ func (c *Client) handleInvocation(msg *Invocation) {
 			}
 
 			if err := c.Send(tosend); err != nil {
-				log.Println("error sending message:", err)
+				logger.Println("error sending message:", err)
 			}
 		}()
 	} else {
-		log.Println("no handler registered for registration:", msg.Registration)
+		logger.Println("no handler registered for registration:", msg.Registration)
 		if err := c.Send(&Error{
 			Type:    INVOCATION,
 			Request: msg.Request,
 			Details: make(map[string]interface{}),
 			Error:   URI(fmt.Sprintf("no handler for registration: %v", msg.Registration)),
 		}); err != nil {
-			log.Println("error sending message:", err)
+			logger.Println("error sending message:", err)
 		}
 	}
 }
 
 func (c *Client) registerListener(id ID) {
-	log.Println("register listener:", id)
+	logger.Println("register listener:", id)
 	wait := make(chan Message, 1)
 	c.listeners[id] = wait
 }
 
 func (c *Client) waitOnListener(id ID) (msg Message, err error) {
-	log.Println("wait on listener:", id)
+	logger.Println("wait on listener:", id)
 	wait, ok := c.listeners[id]
 	if !ok {
 		return nil, fmt.Errorf("unknown listener ID: %v", id)

@@ -1,4 +1,4 @@
-package turnpike
+package gowamp
 
 import (
 	"fmt"

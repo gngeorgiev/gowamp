@@ -1,4 +1,4 @@
-package turnpike
+package gowamp
 
 import (
 	"testing"
@@ -16,7 +16,7 @@ func TestSubscribe(t *testing.T) {
 	Convey("Subscribing to a topic", t, func() {
 		broker := NewDefaultBroker().(*defaultBroker)
 		subscriber := &TestSender{}
-		testTopic := URI("turnpike.test.topic")
+		testTopic := URI("gowamp.test.topic")
 		msg := &Subscribe{Request: 123, Topic: testTopic}
 		broker.Subscribe(subscriber, msg)
 
@@ -39,7 +39,7 @@ func TestSubscribe(t *testing.T) {
 func TestUnsubscribe(t *testing.T) {
 	broker := NewDefaultBroker().(*defaultBroker)
 	subscriber := &TestSender{}
-	testTopic := URI("turnpike.test.topic")
+	testTopic := URI("gowamp.test.topic")
 	msg := &Subscribe{Request: 123, Topic: testTopic}
 	broker.Subscribe(subscriber, msg)
 	sub := subscriber.received.(*Subscribed).Subscription
