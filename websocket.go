@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"time"
 
+	"sync"
+
 	"github.com/gorilla/websocket"
 )
 
@@ -13,6 +15,7 @@ type websocketPeer struct {
 	messages    chan Message
 	payloadType int
 	closed      bool
+	mu          sync.Mutex
 }
 
 // NewWebsocketPeer connects to the websocket server at the specified url.
@@ -56,7 +59,12 @@ func (ep *websocketPeer) Send(msg Message) error {
 	if err != nil {
 		return err
 	}
-	return ep.conn.WriteMessage(ep.payloadType, b)
+
+	ep.mu.Lock()
+	writeError := ep.conn.WriteMessage(ep.payloadType, b)
+	ep.mu.Unlock()
+
+	return writeError
 }
 func (ep *websocketPeer) Receive() <-chan Message {
 	return ep.messages
